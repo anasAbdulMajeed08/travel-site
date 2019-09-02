@@ -6,9 +6,6 @@
 		padding-top:80px;
 	}
 
-	&--gutters-small {
-		margin-right: -45px;
-	}
 
 	&--gutters {
 		margin-right:-65px;
@@ -18,6 +15,10 @@
 		margin-right:-100px;
 	}	
 
+	&--gutters-small {
+		margin-right: -45px;
+	}
+	
 	&--gutters > div {
 		padding-right: 65px;
 	}
