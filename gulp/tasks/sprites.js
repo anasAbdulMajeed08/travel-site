@@ -1,12 +1,25 @@
 var gulp      = require('gulp'),
     svgSprite = require('gulp-svg-sprite'),
     rename    = require('gulp-rename'),
-    del       = require('del');
+    del       = require('del'),
+    svg2png   = require('gulp-svg2png');
 
 //step2: svgSprite(config) pipe process, i.e how should be organized the flowing sources through this pipe.
 var config = {
+	shape: { 
+		spacing: {
+			padding: 1,
+		}
+	},
 	mode: {
 		css: {
+			variables: {
+				replaceSvgWithPng: function(){
+					return function(sprite, render) {
+						return render(sprite).split('.svg').join('.png');
+					}
+				}
+			},
 			sprite: 'sprite.svg',
 			render: {
 				css: {
@@ -27,8 +40,14 @@ gulp.task('createSprite', ['beginClean'], function(){
 		.pipe(gulp.dest('./app/temp/sprite/'));			  //output coming from svgSprite(config) pipe.
 });
 
-gulp.task('copySpriteGraphic', ['createSprite'], function(){
-	return gulp.src('./app/temp/sprite/css/**/*.svg')
+gulp.task('createPngCopy', ['createSprite'], function() {
+	return gulp.src('./app/temp/sprite/css/*.svg')
+		.pipe(svg2png())
+		.pipe(gulp.dest('./app/temp/sprite/css/'));
+});
+
+gulp.task('copySpriteGraphic', ['createPngCopy'], function(){
+	return gulp.src('./app/temp/sprite/css/**/*.{svg,png}')
 		.pipe(gulp.dest('./app/assets/images/sprites'));
 });
 
@@ -44,5 +63,5 @@ gulp.task('endClean', ['copySpriteGraphic', 'copySpriteCSS'], function(){
 	return del('./app/temp/sprite');
 });
 
-gulp.task('icons', ['beginClean', 'createSprite', 'copySpriteGraphic', 'copySpriteCSS', 'endClean']); // keep in mind here declared task icon is depended(d) on ['d1', 'd2', ...'dn']. described task works simultaneously. in order to achieve ['d1'] to complete first
+gulp.task('icons', ['beginClean', 'createSprite', 'createPngCopy', 'copySpriteGraphic', 'copySpriteCSS', 'endClean']); // keep in mind here declared task icon is depended(d) on ['d1', 'd2', ...'dn']. described task works simultaneously. in order to achieve ['d1'] to complete first
 
